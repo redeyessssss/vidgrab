@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VidGrab - Free Video Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--light);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        nav.scrolled {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 15px 5%;
+        }
+        
+        .nav-logo {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+    <div class="nav-logo">🎬 VidGrab</div>
+    <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#faq">FAQ</a></li>
+    </ul>
+</nav>
+
+<style>
+    /* Hero Section */
+    .hero {
+        min-height: 100vh;
+        background: linear-gradient(-45deg, var(--primary), var(--secondary), var(--accent), #f5576c);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 20px 80px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .hero-content {
+        max-width: 800px;
+        text-align: center;
+        z-index: 1;
+        animation: fadeInUp 1s ease;
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .hero h1 {
+        font-size: 3.5em;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 20px;
+        text-shadow: 0 4px 30px rgba(0,0,0,0.2);
+    }
+    
+    .hero p {
+        font-size: 1.3em;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 40px;
+    }
+    
+    .download-box {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+        animation: fadeInUp 1s ease 0.3s both;
+    }
+    
+    .input-group {
+        display: flex;
+        gap: 12px;
+        background: var(--light);
+        padding: 8px;
+        border-radius: 14px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .input-group:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        background: white;
+    }
+    
+    input[type="text"] {
+        flex: 1;
+        padding: 18px 22px;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        font-family: inherit;
+        outline: none;
+        min-width: 300px;
+    }
+    
+    .btn {
+        padding: 18px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: inherit;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+    }
+</style>
+
+<section class="hero" id="home">
+    <div class="hero-content">
+        <h1>Download Videos Instantly</h1>
+        <p>Free, fast, and unlimited downloads from YouTube, Instagram, TikTok, and 1000+ sites</p>
+        
+        <div class="download-box">
+            <div class="input-group">
+                <input type="text" id="videoUrl" placeholder="Paste your video URL here...">
+                <button class="btn btn-primary" id="fetchBtn" onclick="fetchVideo()">
+                    <span>Download</span>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="loader"></div>
+            <div id="result"></div>
+        </div>
+    </div>
+</section>
+""
+
+<style>
+    /* Features Section */
+    .features {
+        padding: 100px 5%;
+        background: white;
+    }
+    
+    .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    
+    .section-title h2 {
+        font-size: 2.5em;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 15px;
+    }
+    
+    .section-title p {
+        color: #666;
+        font-size: 1.1em;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .feature-card {
+        background: var(--light);
+        padding: 40px 30px;
+        border-radius: 20px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid #eee;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(102, 126, 234, 0.15);
+        border-color: var(--primary);
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        font-size: 2em;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.3em;
+        color: var(--dark);
+        margin-bottom: 12px;
+    }
+    
+    .feature-card p {
+        color: #666;
+        line-height: 1.7;
+    }
+    
+    /* Platforms */
+    .platforms-bar {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 50px;
+        padding-top: 50px;
+        border-top: 1px solid #eee;
+    }
+    
+    .platform-badge {
+        background: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 500;
+        color: #555;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        cursor: default;
+    }
+    
+    .platform-badge:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+</style>
+
+<section class="features" id="features">
+    <div class="section-title">
+        <h2>Why Choose VidGrab?</h2>
+        <p>The most powerful and user-friendly video downloader on the web</p>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Lightning Fast</h3>
+            <p>Download videos in seconds with our optimized servers and smart processing technology</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Multiple Qualities</h3>
+            <p>Choose from various quality options including HD, Full HD, and 4K when available</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>100% Secure</h3>
+            <p>Your privacy matters. We don't store any of your data or downloaded videos</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3>Completely Free</h3>
+            <p>No hidden fees, no subscriptions, no limits. Download as many videos as you want</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3>1000+ Sites</h3>
+            <p>Support for YouTube, Instagram, TikTok, Facebook, Twitter, and many more platforms</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Works Everywhere</h3>
+            <p>Use on any device - desktop, tablet, or mobile. No app installation required</p>
+        </div>
+    </div>
+    
+    <div class="platforms-bar">
+        <span class="platform-badge">📺 YouTube</span>
+        <span class="platform-badge">📸 Instagram</span>
+        <span class="platform-badge">🎵 TikTok</span>
+        <span class="platform-badge">📘 Facebook</span>
+        <span class="platform-badge">🐦 Twitter/X</span>
+        <span class="platform-badge">🎬 Vimeo</span>
+        <span class="platform-badge">📌 Pinterest</span>
+        <span class="platform-badge">🔴 Reddit</span>
+    </div>
+</section>
+
+<style>
+    /* How It Works */
+    .how-it-works {
+        padding: 100px 5%;
+        background: linear-gradient(135deg, #f8f9fa, #fff);
+    }
+    
+    .steps {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .step {
+        text-align: center;
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+    }
+    
+    .step-number {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        font-size: 1.8em;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .step h3 {
+        font-size: 1.3em;
+        color: var(--dark);
+        margin-bottom: 10px;
+    }
+    
+    .step p { color: #666; }
+    
+    /* About Section */
+    .about {
+        padding: 100px 5%;
+        background: var(--dark);
+        color: white;
+    }
+    
+    .about-content {
+        max-width: 900px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+    }
+    
+    .about-text h2 {
+        font-size: 2.5em;
+        margin-bottom: 25px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .about-text p {
+        color: rgba(255,255,255,0.8);
+        line-height: 1.8;
+        margin-bottom: 20px;
+    }
+    
+    .about-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+    
+    .stat {
+        text-align: center;
+        padding: 30px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .stat-label { color: rgba(255,255,255,0.7); margin-top: 5px; }
+</style>
+
+<section class="how-it-works" id="how-it-works">
+    <div class="section-title">
+        <h2>How It Works</h2>
+        <p>Download any video in just 3 simple steps</p>
+    </div>
+    
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Copy URL</h3>
+            <p>Copy the video URL from YouTube, Instagram, TikTok, or any supported platform</p>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>Paste & Click</h3>
+            <p>Paste the URL in the input box above and click the Download button</p>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Download</h3>
+            <p>Choose your preferred quality and download the video to your device</p>
+        </div>
+    </div>
+</section>
+
+<section class="about" id="about">
+    <div class="about-content">
+        <div class="about-text">
+            <h2>About VidGrab</h2>
+            <p>VidGrab is a free online video downloader that allows you to download videos from various platforms quickly and easily. Our mission is to provide a simple, fast, and reliable service for everyone.</p>
+            <p>Built with modern technology, VidGrab supports over 1000 websites and offers multiple quality options for your downloads. We believe in providing free access to content you love.</p>
+        </div>
+        <div class="about-stats">
+            <div class="stat">
+                <div class="stat-number">1M+</div>
+                <div class="stat-label">Downloads</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Supported Sites</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Free Forever</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Available</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* FAQ Section */
+    .faq {
+        padding: 100px 5%;
+        background: white;
+    }
+    
+    .faq-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .faq-item {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .faq-item:hover { border-color: var(--primary); }
+    
+    .faq-question {
+        padding: 25px 30px;
+        background: var(--light);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: var(--dark);
+        transition: all 0.3s ease;
+    }
+    
+    .faq-question:hover { background: #f0f0f0; }
+    
+    .faq-icon {
+        font-size: 1.5em;
+        transition: transform 0.3s ease;
+        color: var(--primary);
+    }
+    
+    .faq-item.active .faq-icon { transform: rotate(45deg); }
+    
+    .faq-answer {
+        padding: 0 30px;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        color: #666;
+        line-height: 1.8;
+    }
+    
+    .faq-item.active .faq-answer {
+        padding: 25px 30px;
+        max-height: 300px;
+    }
+    
+    /* Footer */
+    footer {
+        background: var(--dark);
+        color: white;
+        padding: 60px 5% 30px;
+    }
+    
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+    }
+    
+    .footer-brand h3 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .footer-brand p { color: rgba(255,255,255,0.6); line-height: 1.7; }
+    
+    .footer-links h4 {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+    }
+    
+    .footer-links ul { list-style: none; }
+    .footer-links li { margin-bottom: 12px; }
+    .footer-links a {
+        color: rgba(255,255,255,0.6);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--primary); }
+    
+    .footer-bottom {
+        max-width: 1200px;
+        margin: 40px auto 0;
+        padding-top: 30px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+        color: rgba(255,255,255,0.5);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .nav-links { display: none; }
+        .hero h1 { font-size: 2.2em; }
+        input[type="text"] { min-width: 150px; }
+        .about-content { grid-template-columns: 1fr; }
+        .footer-content { grid-template-columns: 1fr 1fr; }
+    }
+</style>
+
+<section class="faq" id="faq">
+    <div class="section-title">
+        <h2>Frequently Asked Questions</h2>
+        <p>Got questions? We've got answers</p>
+    </div>
+    
+    <div class="faq-container">
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                <span>Is VidGrab free to use?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">Yes, VidGrab is completely free to use. There are no hidden fees, subscriptions, or download limits. You can download as many videos as you want without paying anything.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                <span>What video quality options are available?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">We offer multiple quality options depending on the source video. This typically includes 360p, 480p, 720p (HD), 1080p (Full HD), and sometimes 4K when available from the original source.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                <span>Which websites are supported?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">VidGrab supports over 1000 websites including YouTube, Instagram, TikTok, Facebook, Twitter/X, Vimeo, Dailymotion, Reddit, Pinterest, and many more. If a site isn't supported, let us know!</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                <span>Is it legal to download videos?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">Downloading videos for personal use is generally acceptable. However, please respect copyright laws and the terms of service of each platform. Don't redistribute copyrighted content without permission.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                <span>Do I need to install any software?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">No! VidGrab works entirely in your web browser. There's no need to install any software, extensions, or apps. Just paste your URL and download.</div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-brand">
+            <h3>🎬 VidGrab</h3>
+            <p>The fastest and most reliable video downloader on the web. Download videos from your favorite platforms for free.</p>
+        </div>
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </div>
+        <div class="footer-links">
+            <h4>Supported Sites</h4>
+            <ul>
+                <li><a href="#">YouTube</a></li>
+                <li><a href="#">Instagram</a></li>
+                <li><a href="#">TikTok</a></li>
+                <li><a href="#">Facebook</a></li>
+            </ul>
+        </div>
+        <div class="footer-links">
+            <h4>Legal</h4>
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">DMCA</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 VidGrab. All rights reserved. Made with ❤️ for video lovers.</p>
+    </div>
+</footer>
+
+<style>
+    /* Loader & Result Styles */
+    #loader {
+        display: none;
+        text-align: center;
+        padding: 30px;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f0f0f0;
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 15px;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    #result { display: none; margin-top: 25px; }
+    
+    .video-card {
+        background: var(--light);
+        border-radius: 16px;
+        padding: 25px;
+        animation: fadeIn 0.5s ease;
+        border: 1px solid #eee;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .video-card img {
+        width: 100%;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .video-card h3 {
+        color: var(--dark);
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+    
+    .video-meta { color: #888; font-size: 0.9em; margin-bottom: 20px; }
+    
+    .formats-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-format {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: white;
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-format:hover { transform: translateY(-2px); }
+    
+    .btn-download {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+        width: 100%;
+        justify-content: center;
+        text-decoration: none;
+    }
+    
+    .error {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+    }
+</style>
+
+<script>
+const API = window.location.origin;
+
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (window.scrollY > 50) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+});
+
+// FAQ toggle
+function toggleFaq(element) {
+    const item = element.parentElement;
+    item.classList.toggle('active');
+}
+
+// Video download functionality
+async function fetchVideo() {
+    const url = document.getElementById('videoUrl').value.trim();
+    if (!url) { 
+        showError('Please enter a video URL');
+        return; 
+    }
+    
+    document.getElementById('loader').style.display = 'block';
+    document.getElementById('loader').innerHTML = '<div class="spinner"></div><p style="color:#666;">Fetching video info...</p>';
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('fetchBtn').disabled = true;
+    
+    try {
+        const res = await fetch(`${API}/api/info`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to fetch');
+        showResult(data, url);
+    } catch (e) {
+        showError(e.message);
+    } finally {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('fetchBtn').disabled = false;
+    }
+}
+
+function formatDuration(seconds) {
+    if (!seconds) return '';
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    if (hrs > 0) return `${hrs}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    return `${mins}:${secs.toString().padStart(2,'0')}`;
+}
+
+function showResult(data, originalUrl) {
+    const encodedUrl = encodeURIComponent(originalUrl);
+    let html = `<div class="video-card">`;
+    
+    if (data.thumbnail) {
+        html += `<img src="${data.thumbnail}" alt="Thumbnail" onerror="this.style.display='none'">`;
+    }
+    
+    html += `<h3>${data.title || 'Video'}</h3>`;
+    if (data.duration) html += `<div class="video-meta">⏱️ ${formatDuration(data.duration)}</div>`;
+    
+    if (data.formats && data.formats.length > 0) {
+        html += `<p style="font-weight:600; color:#555; margin-bottom:12px;">Select Quality:</p><div class="formats-grid">`;
+        data.formats.forEach(f => {
+            html += `<a href="${API}/api/download?url=${encodedUrl}&itag=${f.itag}" class="btn-format" target="_blank">${f.quality} ${f.size}</a>`;
+        });
+        html += `</div>`;
+    }
+    
+    html += `<a href="${API}/api/download?url=${encodedUrl}" class="btn btn-download" target="_blank">⬇️ Download Best Quality</a>`;
+    html += `</div>`;
+    
+    document.getElementById('result').innerHTML = html;
+    document.getElementById('result').style.display = 'block';
+}
+
+function showError(msg) {
+    document.getElementById('result').innerHTML = `<div class="error">❌ ${msg}</div>`;
+    document.getElementById('result').style.display = 'block';
+}
+
+document.getElementById('videoUrl').addEventListener('keypress', e => { 
+    if (e.key === 'Enter') fetchVideo(); 
+});
+
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    });
+});
+</script>
+</body>
+</html>
